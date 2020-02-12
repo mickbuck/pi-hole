@@ -45,6 +45,10 @@ Found the name is newt not Whiptail, DOH!
 -----------
 
 
+[ ] Warning: Unable to locate configuration file to set static IPv4 addres
+Added setDCHPAL to the file
+Installed but broke network
+
 
 
 

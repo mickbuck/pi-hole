@@ -1,0 +1,50 @@
+Enable SSH
+
+vi /etc/ssh/sshd_config
+
+PermitRootLogin yes
+
+/etc/init.d/sshd restart
+
+----
+
+Add PiHole
+
+apk add bash
+-----------------
+
+wget -O basic-install.sh https://install.pi-hole.net
+bash basic-install.sh <--- fails [x]  OS distribution not supported
+
+-----
+Lets try from Source
+
+
+Added whiptail
+
+Errors :
+pihole:~/pi-hole/automated install# apk add whiptail
+ERROR: unsatisfiable constraints:
+  whiptail (missing):
+    required by: world[whiptail]
+
+_____
+
+Like https://stackoverflow.com/questions/48892448/error-unsatisfiable-constraints-using-apk-in-dockerfile did the following:
+
+echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+apk update
+apk search --no-cache whiptail
+RUN apk update \
+    && apk add -u whiptail\
+    && rm -rf /var/lib/apt/lists/*
+
+Checked https://pkgs.alpinelinux.org/contents?file=whiptail&path=&name=&branch=v3.6&arch=x86_64 
+Found the name is newt not Whiptail, DOH!
+
+-----------
+
+
+
+
+

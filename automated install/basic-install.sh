@@ -649,7 +649,7 @@ setDHCPCD() {
     fi
 }
 
-setDHCPAL
+setDHCPAL () {
 # check if the IP is already in the file
 if grep -q "${IPV4_ADDRESS}" /etc/network/interfaces; then
     printf "  %b Static IP already configured\\n" "${INFO}"

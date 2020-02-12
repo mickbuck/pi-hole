@@ -2289,7 +2289,7 @@ main() {
     fi
 
     # Check for supported distribution
-    distro_check
+  #  distro_check
 
     # If the setup variable file exists,
     if [[ -f "${setupVars}" ]]; then

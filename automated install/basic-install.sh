@@ -608,9 +608,16 @@ It is also possible to use a DHCP reservation, but if you are going to do that, 
         { ipSettingsCorrect=False; echo -e "  ${COL_LIGHT_RED}Cancel was selected, exiting installer${COL_NC}"; exit 1; }
         printf "  %b Your static IPv4 gateway: %s\\n" "${INFO}" "${IPv4gw}"
 
+        # Ask for the subnet
+        IPv4gw=$(whiptail --backtitle "Calibrating network interface" --title "IPv4 subnet (router)" --inputbox "Enter your desired IPv4 default subnet" ${r} ${c} "${IPv4gw}" 3>&1 1>&2 2>&3) || \
+        # Cancelling gateway settings window
+        { ipSettingsCorrect=False; echo -e "  ${COL_LIGHT_RED}Cancel was selected, exiting installer${COL_NC}"; exit 1; }
+        printf "  %b Your static IPv4 gateway: %s\\n" "${INFO}" "${IPV4_NetMask}"
+
         # Give the user a chance to review their settings before moving on
         if whiptail --backtitle "Calibrating network interface" --title "Static IP Address" --yesno "Are these settings correct?
             IP address: ${IPV4_ADDRESS}
+
             Gateway:    ${IPv4gw}" ${r} ${c}; then
                 # After that's done, the loop ends and we move on
                 ipSettingsCorrect=True
@@ -641,6 +648,26 @@ setDHCPCD() {
         printf "  %b Set IP address to %s \\n  You may need to restart after the install is complete\\n" "${TICK}" "${IPV4_ADDRESS%/*}"
     fi
 }
+
+setDHCPAL
+# check if the IP is already in the file
+if grep -q "${IPV4_ADDRESS}" /etc/network/interfaces; then
+    printf "  %b Static IP already configured\\n" "${INFO}"
+# If it's not,
+else
+    # we can append these lines to dhcpcd.conf to enable a static IP
+    echo "iface ${PIHOLE_INTERFACE} inet static
+    address ${IPV4_ADDRESS}
+    netmask ${IPV4_NetMask}
+    gateway ${IPv4gw}
+    " | tee -a /etc/network/interfaces >/dev/null
+    # Then use the ip command to immediately set the new address
+    ip addr replace dev "${PIHOLE_INTERFACE}" "${IPV4_ADDRESS}"
+    # Also give a warning that the user may need to reboot their system
+    printf "  %b Set IP address to %s \\n  You may need to restart after the install is complete\\n" "${TICK}" "${IPV4_ADDRESS%/*}"
+fi
+}
+
 
 # configure networking ifcfg-xxxx file found at /etc/sysconfig/network-scripts/
 # this function requires the full path of an ifcfg file passed as an argument
@@ -702,6 +729,13 @@ setStaticIPv4() {
         setDHCPCD
         return 0
     fi
+    # For Alpine Linux, if /etc/network/interfaces exists
+    if [[ -f "/etc/dhcpcd.conf" ]]; then
+        # configure networking via dhcpcd
+        setDHCPAL
+        return 0
+    fi
+
     # If a DHCPCD config file was not found, check for an ifcfg config file based on interface name
     if [[ -f "/etc/sysconfig/network-scripts/ifcfg-${PIHOLE_INTERFACE}" ]];then
         # If it exists,

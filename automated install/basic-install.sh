@@ -649,24 +649,24 @@ setDHCPCD() {
     fi
 }
 
-setDHCPAL () {
+#setDHCPAL () {
 # check if the IP is already in the file
-if grep -q "${IPV4_ADDRESS}" /etc/network/interfaces; then
-    printf "  %b Static IP already configured\\n" "${INFO}"
+#if grep -q "${IPV4_ADDRESS}" /etc/network/interfaces; then
+    #printf "  %b Static IP already configured\\n" "${INFO}"
 # If it's not,
-else
+#else
     # we can append these lines to dhcpcd.conf to enable a static IP
-    echo "iface ${PIHOLE_INTERFACE} inet static
-    address ${IPV4_ADDRESS}
-    netmask ${IPV4_NetMask}
-    gateway ${IPv4gw}
-    " | tee -a /etc/network/interfaces >/dev/null
-    # Then use the ip command to immediately set the new address
-    ip addr replace dev "${PIHOLE_INTERFACE}" "${IPV4_ADDRESS}"
+    #echo "iface ${PIHOLE_INTERFACE} inet static
+    #address ${IPV4_ADDRESS}
+    #netmask ${IPV4_NetMask}
+    #gateway ${IPv4gw}
+    #" | tee -a /etc/network/interfaces >/dev/null
+    ## Then use the ip command to immediately set the new address
+    #ip addr replace dev "${PIHOLE_INTERFACE}" "${IPV4_ADDRESS}"
     # Also give a warning that the user may need to reboot their system
-    printf "  %b Set IP address to %s \\n  You may need to restart after the install is complete\\n" "${TICK}" "${IPV4_ADDRESS%/*}"
-fi
-}
+  #  printf "  %b Set IP address to %s \\n  You may need to restart after the install is complete\\n" "${TICK}" "${IPV4_ADDRESS%/*}"
+#fi
+#}
 
 
 # configure networking ifcfg-xxxx file found at /etc/sysconfig/network-scripts/

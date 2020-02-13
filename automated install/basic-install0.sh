@@ -366,6 +366,9 @@ elif is_command rpm ; then
         fi
     fi
 
+elif is_command apk ; Then
+
+  printf " %b OS is supported let go techno"
 # If neither apt-get or yum/dnf package managers were found
 else
     # it's not an OS we can support,

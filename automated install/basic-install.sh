@@ -649,7 +649,7 @@ setDHCPCD() {
     fi
 }
 
-setDHCPAL () {
+#setDHCPAL () {
 # check if the IP is already in the file
 #if grep -q "${IPV4_ADDRESS}" /etc/network/interfaces; then
     #printf "  %b Static IP already configured\\n" "${INFO}"
@@ -666,7 +666,7 @@ setDHCPAL () {
     # Also give a warning that the user may need to reboot their system
   #  printf "  %b Set IP address to %s \\n  You may need to restart after the install is complete\\n" "${TICK}" "${IPV4_ADDRESS%/*}"
 #fi
-}
+#}
 
 
 # configure networking ifcfg-xxxx file found at /etc/sysconfig/network-scripts/

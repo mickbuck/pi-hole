@@ -111,3 +111,4 @@ else
     exit
 fi
 }
+distro_check

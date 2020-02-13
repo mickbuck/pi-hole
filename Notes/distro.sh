@@ -187,10 +187,10 @@ elif is_command rpm ; then
             printf "  %b Continuing installation with unsupported RPM based distribution\\n" "${INFO}"
         fi
     fi
-elif is_command apk; then
+elif is_command apk ; then
 
-  printf "  %b OS distribution supported\\n" "${CROSS}"
-
+  printf "  %b OS distribution supported\\n"
+exit
 # If neither apt-get or yum/dnf package managers were found
 else
     # it's not an OS we can support,

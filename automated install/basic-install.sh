@@ -732,7 +732,7 @@ setStaticIPv4() {
     # For Alpine Linux, if /etc/network/interfaces exists
     if [[ -f "/etc/network/interfaces" ]]; then
         # configure networking via dhcpcd
-        setDHCPAL
+      #  setDHCPAL
         return 0
     fi
 

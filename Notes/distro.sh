@@ -13,7 +13,7 @@ is_command() {
 
 distro_check() {
 # If apt-get is installed, then we know it's part of the Debian family
-if is_command apk ; then
+if is_command apt-get ; then
     # Set some global variables here
     # We don't set them earlier since the family might be Red Hat, so these values would be different
     PKG_MANAGER="apt-get"
@@ -109,7 +109,7 @@ if is_command apk ; then
     }
 
 # If apt-get is not found, check for rpm to see if it's a Red Hat family OS
-elif is_command tttt ; then
+elif is_command apk ; then
 
   printf "  %b OS distribution supported\\n"
 

@@ -974,11 +974,19 @@ setStaticIPv4() {
         fi
     fi
     # For the Debian family, if dhcpcd.conf exists,
+    # For Alpine Linux, if /etc/network/interfaces exists
+    if [[ -f "/etc/network/interfaces" ]]; then
+        # configure networking via dhcpcd
+      #  setDHCPAL
+        return 0
+    fi
+    
     if [[ -f "/etc/dhcpcd.conf" ]]; then
         # configure networking via dhcpcd
         setDHCPCD
         return 0
     fi
+
     # If a DHCPCD config file was not found, check for an ifcfg config file based on interface name
     if [[ -f "/etc/sysconfig/network-scripts/ifcfg-${PIHOLE_INTERFACE}" ]];then
         # If it exists,

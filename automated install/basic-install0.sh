@@ -367,8 +367,83 @@ elif is_command rpm ; then
     fi
 
 elif is_command apk ; then
+  printf " %b OS is part supported let go techno\\n"
+  #Setting "APK" as package manager.
+  PKG_MANAGER="apk"
+  #Not yet sure what this is doing but sure it will become clear
+  iproute_pkg="iproute2"
 
-  printf " %b OS is supported let go techno\\n" 
+
+  if is_command php ; then
+      printf "  %b Existing PHP installation detected : PHP version %s\\n" "${INFO}" "$(php <<< "<?php echo PHP_VERSION ?>")"
+      printf -v phpInsMajor "%d" "$(php <<< "<?php echo PHP_MAJOR_VERSION ?>")"
+      printf -v phpInsMinor "%d" "$(php <<< "<?php echo PHP_MINOR_VERSION ?>")"
+      # Is installed php version 7.0 or greater
+      if [ "${phpInsMajor}" -ge 7 ]; then
+          phpInsNewer=true
+      fi
+  fi
+  # Check if installed php is v 7.0, or newer to determine packages to install
+  if [[ "$phpInsNewer" != true ]]; then
+      # Prefer the php metapackage if it's there
+      if ${PKG_MANAGER} add --dry-run php > /dev/null 2>&1; then
+          phpVer="php"
+      # fall back on the php5 packages
+      else
+          phpVer="php7"
+      fi
+  else
+      # Newer php is installed, its common, cgi & sqlite counterparts are deps
+      phpVer="php$phpInsMajor.$phpInsMinor"
+  fi
+  # We also need the correct version for `php-sqlite` (which differs across distros)
+  if ${PKG_MANAGER} add --dry-run ${phpVer}-sqlite3 > /dev/null 2>&1; then
+      phpSqlite="sqlite3"
+  else
+      phpSqlite="sqlite"
+  fi
+
+
+  #########################3
+  # Since our install script is so large, we need several other programs to successfully get a machine provisioned
+  # These programs are stored in an array so they can be looped through later
+  INSTALLER_DEPS=( dialog git ${iproute_pkg} newt)
+  #missing apt-utils, debconf, dhcpcd5
+
+  # Pi-hole itself has several dependencies that also need to be installed
+  PIHOLE_DEPS=(cron curl dnsutils iputils-ping lsof netcat psmisc sudo unzip wget idn2 sqlite3 libcap2-bin dns-root-data resolvconf libcap2)
+  # The Web dashboard has some that also need to be installed
+  # It's useful to separate the two since our repos are also setup as "Core" code and "Web" code
+  PIHOLE_WEB_DEPS=(lighttpd ${phpVer}-common ${phpVer}-cgi ${phpVer}-${phpSqlite})
+  # The Web server user,
+  LIGHTTPD_USER="www-data"
+  # group,
+  LIGHTTPD_GROUP="www-data"
+  # and config file
+  LIGHTTPD_CFG="lighttpd.conf.debian"
+
+  # A function to check...
+  test_dpkg_lock() {
+      # An iterator used for counting loop iterations
+      i=0
+      # fuser is a program to show which processes use the named files, sockets, or filesystems
+      # So while the command is true
+      while fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
+          # Wait half a second
+          sleep 0.5
+          # and increase the iterator
+          ((i=i+1))
+      done
+      # Always return success, since we only return if there is no
+      # lock (anymore)
+      return 0
+  }
+
+
+
+
+
+
 # If neither apt-get or yum/dnf package managers were found
 else
     # it's not an OS we can support,
@@ -838,6 +913,11 @@ setDHCPCD() {
         printf "  %b Set IP address to %s \\n  You may need to restart after the install is complete\\n" "${TICK}" "${IPV4_ADDRESS%/*}"
     fi
 }
+
+
+
+
+
 
 # configure networking ifcfg-xxxx file found at /etc/sysconfig/network-scripts/
 # this function requires the full path of an ifcfg file passed as an argument

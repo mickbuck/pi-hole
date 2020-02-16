@@ -980,7 +980,7 @@ setStaticIPv4() {
       #  setDHCPAL
         return 0
     fi
-    
+
     if [[ -f "/etc/dhcpcd.conf" ]]; then
         # configure networking via dhcpcd
         setDHCPCD
@@ -1832,7 +1832,7 @@ create_pihole_user() {
         local str="Creating user 'pihole'"
         printf "%b  %b %s..." "${OVER}" "${INFO}" "${str}"
         # create her with the useradd command
-        if useradd -r -s /usr/sbin/nologin pihole; then
+        if adduser -D -H pihole; then
           printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
         else
           printf "%b  %b %s\\n" "${OVER}" "${CROSS}" "${str}"
